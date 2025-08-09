@@ -200,7 +200,7 @@
 > `Qiita` -> `Zenn`の場合、`paths`には`public/*.md`を設定します。
 
 ```yaml
-name: Run sync-zenn-qiita
+name: Run sync-zenn-qiita-articles
 
 on:
   push:
@@ -218,7 +218,7 @@ on:
 
 ```yaml
 jobs:
-  sync-zenn-qiita:
+  sync-zenn-qiita-articles:
     if: github.actor == '<your-user-name>'
 
     runs-on: ubuntu-latest
@@ -268,13 +268,13 @@ Github Apps トークンの生成を設定します。
           persist-credentials: false
 ```
 
-`sync-zenn-qiita`の実行を設定します。
+`sync-zenn-qiita-articles`の実行を設定します。
 
-`sync-zenn-qiita`の引数は、下表に示します。
+`sync-zenn-qiita-articles`の引数は、下表に示します。
 
 ```yaml
-      - name: Run sync-zenn-qiita
-        uses: r-dev95/sync-zenn-qiita@main
+      - name: Run sync-zenn-qiita-articles
+        uses: r-dev95/sync-zenn-qiita-articles@main
         with:
           zenn-repo-name: <your-zenn-repository-name>
           qiita-repo-name: <your-qiita-repository-name>
@@ -291,7 +291,7 @@ Github Apps トークンの生成を設定します。
 |sync-to-repo-name |〇     |同期先のリポジトリ名           |`Zenn`または`Qiita`用のリポジトリ名                 |
 |git-token         |〇     |同期先への書き込み権限トークン |-                                                   |
 |commit-msg        |-      |同期先へのコミットメッセージ   |デフォルト: `Auto Commit.`                          |
-|config-path       |-      |コンフィグファイルのパス       |デフォルト: `sync-zenn-qiita/dist/sync-config.json` |
+|config-path       |-      |コンフィグファイルのパス       |デフォルト: `sync-zenn-qiita-articles/dist/sync-config.json` |
 
 ### コンフィグファイルを作成
 
