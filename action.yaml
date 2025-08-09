@@ -73,7 +73,7 @@ runs:
 
     - name: Diff files
       run: |
-        if [ "${{ env.TO_QIITA }}" = "ture" ]; then
+        if [ "${{ env.TO_QIITA }}" = "true" ]; then
           cd ${{ inputs.zenn-repo-name }}
         else
           cd ${{ inputs.qiita-repo-name }}
