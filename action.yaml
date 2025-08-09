@@ -43,7 +43,7 @@ runs:
           echo "TO_QIITA=true" >> $GITHUB_ENV
           echo "GREP_COND=^A\?M\?D\?[[:space:]]*articles/.*\.md$" >> $GITHUB_ENV
           echo "GIT_ADD_CONTENT_PATH=public" >> $GITHUB_ENV
-        elif [ "${{ inputs.sync-to-repo-name }}" == "${{ inputs.zenn-repo-name }}" ]; then
+        elif [ "${{ inputs.sync-to-repo-name }}" = "${{ inputs.zenn-repo-name }}" ]; then
           echo "TO_QIITA=false" >> $GITHUB_ENV
           echo "GREP_COND=^A\?M\?D\?[[:space:]]*public/.*\.md$" >> $GITHUB_ENV
           echo "GIT_ADD_CONTENT_PATH=articles" >> $GITHUB_ENV
@@ -73,7 +73,7 @@ runs:
 
     - name: Diff files
       run: |
-        if [ "${{ env.TO_QIITA }}" == "ture" ]; then
+        if [ "${{ env.TO_QIITA }}" = "ture" ]; then
           cd ${{ inputs.zenn-repo-name }}
         else
           cd ${{ inputs.qiita-repo-name }}
