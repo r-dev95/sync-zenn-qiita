@@ -1,4 +1,4 @@
-name: sync zenn qiita
+name: sync zenn qiita articles
 description: |
   Syncs Zenn and Qiita articles mutually.
   Automates article generation and pushing to the repository.
@@ -27,16 +27,16 @@ inputs:
   config-path:
     description: The config path for the Converter.
     required: false
-    default: "sync-zenn-qiita/dist/sync-config.json"
+    default: "sync-zenn-qiita-articles/dist/sync-config.json"
 
 runs:
   using: composite
   steps:
     - name: Setup env variables
       run: |
-        echo "ACTIONS_REPO_NAME=sync-zenn-qiita" >> $GITHUB_ENV
+        echo "ACTIONS_REPO_NAME=sync-zenn-qiita-articles" >> $GITHUB_ENV
         echo "DIFF_FPATH=../diff.txt" >> $GITHUB_ENV
-        echo "CONVERTER_FPATH=sync-zenn-qiita/dist/index.js" >> $GITHUB_ENV
+        echo "CONVERTER_FPATH=sync-zenn-qiita-articles/dist/index.js" >> $GITHUB_ENV
         echo "ZENN_CONTENT_PATH=${{ inputs.zenn-repo-name }}/articles" >> $GITHUB_ENV
         echo "QIITA_CONTENT_PATH=${{ inputs.qiita-repo-name }}/public" >> $GITHUB_ENV
         if [ "${{ inputs.sync-to-repo-name }}" = "${{ inputs.qiita-repo-name }}" ]; then
@@ -58,7 +58,7 @@ runs:
       with:
         node-version: 24
 
-    - name: Checkout repository for sync-zenn-qiita
+    - name: Checkout repository for sync-zenn-qiita-articles
       uses: actions/checkout@v4
       with:
         repository: r-dev95/${{ env.ACTIONS_REPO_NAME }}
