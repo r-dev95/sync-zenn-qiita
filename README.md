@@ -30,9 +30,8 @@
   Overview
  ============================================================ -->
 
-# :book:Overview
+# :book: Overview
 
-<!-- [![English](https://img.shields.io/badge/English-018EF5.svg?labelColor=d3d3d3&logo=readme)](./README.md) -->
 [![Japanese](https://img.shields.io/badge/Japanese-018EF5.svg?labelColor=d3d3d3&logo=readme)](./README.md)
 [![license](https://img.shields.io/github/license/r-dev95/customtkinter-create-theme-app)](./LICENSE)
 [![Zenn](https://img.shields.io/badge/Zenn-3EA8FF.svg?labelColor=d3d3d3&logo=zenn)](https://zenn.dev/)
@@ -41,49 +40,27 @@
 [![NodeJS](https://img.shields.io/badge/Node.js-339933.svg?labelColor=d3d3d3&logo=node.js)](https://github.com/nodejs/node)
 [![TypeScript](https://img.shields.io/badge/TypeScript-3776AB.svg?labelColor=d3d3d3&logo=typescript)](https://github.com/microsoft/TypeScript)
 
-本リポジトリでは、`Zenn`と`Qiita`の記事を相互に同期するための Github Actions を提供します。
+このリポジトリは、**ZennとQiitaの記事を相互に同期するためのGitHub Actions**を提供します。
 
-本アクションを使用すれば、一方のプラットフォームの記事からもう一方のプラットフォームの記事を自動で生成できます。
-
-以降、同期元を`Zenn`、同期先を`Qiita`とする場合、`Zenn` -> `Qiita`と記述します。
-逆の場合、`Qiita` -> `Zenn`と記述します。
+Zennで書いた記事をQiitaへ、あるいはQiitaで書いた記事をZennへ、リポジトリにプッシュするだけで自動的に変換・投稿（コミット＆プッシュ）できます。これにより、両プラットフォームでの記事管理の手間を大幅に削減します。
 
 <!-- ============================================================
   Features
  ============================================================ -->
 
-## :desktop_computer:Features
+## :desktop_computer: Features
 
-本アクションの主な機能を示します。
-
-### 差分検知
-
-`git diff`を用いて、同期元リポジトリの前回と今回のプッシュの差分を取得し、変更のあったファイル（追加・更新・削除）のみを処理対象とします。
-
-### 双方向のフォーマット変換（[詳細](#双方向のフォーマット変換について)）
-
-`Zenn` -> `Qiita`または`Qiita` -> `Zenn`の双方向にマークダウンのフォーマットを変換します。
-
-- メタデータの変換: プラットフォーム独自のfront matterを変換します。
-- コンテンツの変換: プラットフォーム独自のマークダウン記法を変換します。
-
-### 同期先ファイルの削除
-
-同期元のファイルが削除された場合、同期先のファイルも削除します。
-
-### リポジトリへのコミット&プッシュ
-
-生成したファイルを同期先リポジトリへコミット&プッシュします。
-
-### ユーザ設定（[詳細](#ユーザ設定について)）
-
-コンフィグファイルによって、ユーザごとに変更可能な設定があります。
+- **差分検知:** `git diff` を利用し、変更があったファイル（追加・更新・削除）のみを同期対象とします。
+- **双方向のフォーマット変換:** ZennとQiita、双方向でマークダウンのメタデータとコンテンツを自動変換します。
+- **ファイルの自動削除:** 同期元で記事を削除すると、同期先の記事も自動で削除されます。
+- **自動コミット＆プッシュ:** 変換後のファイルを指定のリポジトリへ自動でコミット＆プッシュします。
+- **柔軟な設定:** コンフィグファイルにより、一部の動作をカスタマイズ可能です。
 
 <!-- ============================================================
   Getting Started
  ============================================================ -->
 
-## :rocket:Getting Started
+## :rocket: Getting Started
 
 <div align=center>
   <img
@@ -93,213 +70,127 @@
   />
 </div>
 
-ここでは、`Zenn` -> `Qiita`の想定で説明します。
+このアクションを利用することで、ZennとQiitaのどちらか一方のリポジトリを更新するだけで、もう一方にも内容が自動で反映されるようになります。
 
-`Qiita` -> `Zenn`の場合、読み替えてください。
+セットアップは、以下の3つのステップで完了します。
+ここでは `Zenn -> Qiita` の同期を例に説明します。（逆方向も同様に設定可能です）
 
-また`Zenn` -> `Qiita`、`Qiita` -> `Zenn`の両方設定することも可能です。
+1. **事前準備:** ZennとQiitaの記事を管理するリポジトリをそれぞれ準備します。
+1. **GitHub Apps の設定:** 同期先リポジトリへの書き込み権限を持つGitHub Appを作成します。
+1. **GitHub Actions の設定:** 同期元リポジトリにワークフローファイルを作成し、同期処理を定義します。
 
-### `Zenn`と`Qiita`のリポジトリを作成
+## :wrench: Setup
 
-`Zenn`と`Qiita`の記事を管理するリポジトリをそれぞれ作成してください。
+### 1. 事前準備
 
-また下記、設定をそれぞれ行ってください。
+まず、ZennとQiitaそれぞれの記事を管理するためのリポジトリをGitHub上に作成します。
 
-- `Zenn`:
+- **Zenn用リポジトリ:**
+  - [Zenn CLIをインストール](https://zenn.dev/zenn/articles/install-zenn-cli)し、リポジトリをセットアップします。
+  - [GitHubリポジトリと連携](https://zenn.dev/zenn/articles/connect-to-github)させ、プッシュで記事が投稿される状態にしておきます。
+- **Qiita用リポジトリ:**
+  - [Qiita CLIをインストール](https://github.com/increments/qiita-cli)し、リポジトリをセットアップします。
+  - `public`ディレクトリが常に存在するように、`.keep`などの空ファイルを置いておくことを推奨します。
 
-  - [Zenn CLI のインストール][zenn-cli]
-  - [Zenn と Github の連携][zenn-github]
+### 2. GitHub Apps の設定
 
-- `Qiita`:
+同期先リポジトリ（例: Qiita用リポジトリ）にファイルを書き込むための権限を持つGitHub Appを作成します。
 
-  - [Qiita CLI のインストール][qiita-cli]
-  - リポジトリにプッシュした際、`public`ディレクトリも反映されるようにファイルを置いてください。(例えば、`.keep`ファイル)
+1. **GitHub Appsの新規作成:**
+    - `Settings` -> `Developer Settings` -> `Github Apps` -> `New Github App` を選択します。
+    - `Github App name`（任意、グローバルで一意）と `Homepage URL`（例: `https://example.com`）を入力します。
+    - `Webhook` の `Active` のチェックを外します。
+1. **権限の設定:**
+    - `Permissions` -> `Repository permissions` -> `Contents` に `Read and write` を設定します。
+1. **プライベートキーの発行:**
+    - 作成したAppのページで `Private keys` -> `Generate a private key` を選択し、キーファイル（`.pem`）をダウンロードします。
+1. **Appのインストール:**
+    - 左メニューの `Install App` から、同期先のリポジトリ（例: Qiita用リポジトリ）を選択してインストールします。
+1. **Secretsの登録:**
+    - **同期元リポジトリ**（例: Zenn用リポジトリ）の `Settings` -> `Secrets and variables` -> `Actions` に移動します。
+    - `New repository secret` を選択し、以下の2つを登録します。
+      - `APP_ID`: 作成したGitHub Appの `App ID`
+      - `PRIVATE_KEY`: ダウンロードしたプライベートキーファイルの中身（テキスト）
 
-`Zenn`、`Qiita`ともにリポジトリにプッシュするだけで投稿できるため、投稿の機能は公式の方法を用います。
+### 3. GitHub Actions の設定
 
-[zenn-cli]: https://zenn.dev/zenn/articles/install-zenn-cli
-[zenn-github]: https://zenn.dev/zenn/articles/connect-to-github
-[qiita-cli]: https://github.com/increments/qiita-cli
+同期元リポジトリ（例: Zenn用リポジトリ）に、同期を実行するためのワークフローファイルを作成します。
 
-### Github Apps を設定する
-
-同期先リポジトリのコンテンツの読み書き権限を得るために Github Apps を設定します。
-
-#### 新規作成
-
-`Settings` -> `Developer Settings` -> `Github Apps`の`New Github Apps`で新規作成を行います。
-
-`Github App name`と`Homepage URL`を設定します。
-
-`Github App name`はグローバルな値のため、重複がないようにします。`Homepage URL`は`https://example.com`のような適当なURLでいいです。
-
-<div align=center>
-  <img
-    src='docs/image/001_githubapps.png'
-    alt='features Image.'
-    width=500
-  />
-</div>
-
-`WebHook`は使用しないのでチェックを外します。
-
-<div align=center>
-  <img
-    src='docs/image/002_githubapps.png'
-    alt='features Image.'
-    width=500
-  />
-</div>
-
-`Permissions` -> `Repository permissions` -> `Contents`の権限に`Read and write`を設定します。
-
-<div align=center>
-  <img
-    src='docs/image/003_githubapps.png'
-    alt='features Image.'
-    width=500
-  />
-</div>
-
-#### プライベートキーの作成
-
-作成が完了すると、作成した Github Apps のページに遷移します。
-
-`Private keys`の`Generate a private key`を押すとプライベートキーが記載されたファイルがダウンロードされます。
-このプライベートキーと`About`の`App ID`は、後で`secrets`に登録します。
-
-#### Apps のインストール
-
-左側メニューの`Install App`から Apps をインストールします。
-
-ここでは`Only select repositories`で、`Qiita`用のリポジトリのみ選択します。
-
-> `Qiita` -> `Zenn`の場合、`Zenn`用のリポジトリを選択します。
-
-#### Repository secrets の設定
-
-`Zenn`用リポジトリの`secrets`を設定します。
-
-> `Qiita` -> `Zenn`の場合、`Zenn`用のリポジトリの`secrets`を設定します。
-
-リポジトリの`Settings` -> `Secrets and variables` -> `Actions`の`New repository secret`で下記を設定してください。
-
-- Github Apps の`App ID`
-- Github Apps のプライベートキー
-
-### ワークフローファイルを作成
-
-`Zenn`用のリポジトリにワークフローファイルを作成します。
-
-> `Qiita` -> `Zenn`の場合、`Qiita`用のリポジトリにワークフローファイルを作成します。
-
-#### イベントの設定
-
-記事のプッシュによるワークフローの発火を設定します。
-
-> `Qiita` -> `Zenn`の場合、`paths`には`public/*.md`を設定します。
+`.github/workflows/sync-articles.yml` のような名前でファイルを作成し、以下の内容を貼り付けてください。
+その後、`< >`で囲まれた部分をご自身の環境に合わせて修正してください。
 
 ```yaml
-name: Run sync-zenn-qiita-articles
+name: Sync Zenn to Qiita
 
 on:
   push:
     branches:
       - main
     paths:
-      - articles/*.md
-```
+      - 'articles/**.md' # Zennの記事ファイルが変更された時のみ実行
 
-#### ジョブの設定
-
-実行環境を設定します。
-
-> `if`の部分は、`Zenn` -> `Qiita`、`Qiita` -> `Zenn`の両方設定する場合に必要です。
-
-```yaml
 jobs:
   sync-zenn-qiita-articles:
-    if: github.actor == '<your-user-name>'
-
+    # 自分のアカウントからのプッシュでのみ実行（Botによる無限ループを防止）
+    if: github.actor == '<your-github-user-name>'
     runs-on: ubuntu-latest
-```
-
-Github Apps トークンの生成を設定します。
-
-```yaml
     steps:
+      # 1. GitHub Appsからトークンを生成
       - name: Generate GitHub Apps token
         id: generate
         uses: actions/create-github-app-token@v1
         with:
-          owner: ${{ github.repository_owner }}
-          app-id: ${{ secrets.<your-github-apps-id-name> }}
-          private-key: ${{ secrets.<your-github-apps-private-key-name> }}
-```
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.PRIVATE_KEY }}
 
-`Zenn`用リポジトリのチェックアウトを設定します。
-
-プッシュ間の差分を取得するために、`fetch-depth: 0`とします。
-
-> `Qiita` -> `Zenn`の場合、`Qiita`用リポジトリを設定します。
-
-```yaml
-      - name: Checkout repository for Zenn
+      # 2. 同期元（Zenn）リポジトリをチェックアウト
+      # git diff を使うため fetch-depth: 0 を指定
+      - name: Checkout Zenn repository
         uses: actions/checkout@v4
         with:
-          path: <your-zenn-repository-name>
+          path: <your-zenn-repo-name>
           fetch-depth: 0
-```
 
-`Qiita`用リポジトリのチェックアウトを設定します。
-
-書き込み権限を得るためにトークンを渡します。
-
-> `Qiita` -> `Zenn`の場合、`Zenn`用リポジトリを設定します。
-
-```yaml
-      - name: Checkout repository for Qiita
+      # 3. 同期先（Qiita）リポジトリをチェックアウト
+      # 書き込み用に生成したトークンを使用
+      - name: Checkout Qiita repository
         uses: actions/checkout@v4
         with:
-          repository: <your-user-name>/<your-qiita-repository-name>
-          path: <your-qiita-repository-name>
+          repository: <your-github-user-name>/<your-qiita-repo-name>
+          path: <your-qiita-repo-name>
           ref: ${{ github.ref }}
           token: ${{ steps.generate.outputs.token }}
           persist-credentials: false
-```
 
-`sync-zenn-qiita-articles`の実行を設定します。
-
-`sync-zenn-qiita-articles`の引数は、下表に示します。
-
-```yaml
+      # 4. 記事の同期アクションを実行
       - name: Run sync-zenn-qiita-articles
         uses: r-dev95/sync-zenn-qiita-articles@main
         with:
-          zenn-repo-name: <your-zenn-repository-name>
-          qiita-repo-name: <your-qiita-repository-name>
-          sync-to-repo-name: <your-qiita-repository-name>
+          zenn-repo-name: <your-zenn-repo-name>
+          qiita-repo-name: <your-qiita-repo-name>
+          sync-to-repo-name: <your-qiita-repo-name> # ZennからQiitaへ同期
           git-token: ${{ steps.generate.outputs.token }}
-          commit-msg: <your-commit-message>
-          config-path: <your-zenn-repository-name>/<your-config-file-path>
+          # commit-msg: <your-commmit-message> # オプション
+          # config-path: <your-zenn-repo-name>/sync-config.json # オプション
 ```
 
-|引数名            |必須   |説明                           |備考                                                |
-| ---              | :---: | ---                           | ---                                                |
-|zenn-repo-name    |〇     |`Zenn`用のリポジトリ名         |-                                                   |
-|qiita-repo-name   |〇     |`Qiita`用のリポジトリ名        |-                                                   |
-|sync-to-repo-name |〇     |同期先のリポジトリ名           |`Zenn`または`Qiita`用のリポジトリ名                 |
-|git-token         |〇     |同期先への書き込み権限トークン |-                                                   |
-|commit-msg        |-      |同期先へのコミットメッセージ   |デフォルト: `Auto Commit.`                          |
-|config-path       |-      |コンフィグファイルのパス       |デフォルト: `sync-zenn-qiita-articles/dist/sync-config.json` |
+#### アクションの入力（`with`）
 
-### コンフィグファイルを作成
+`sync-zenn-qiita-articles`アクションで使用する引数です。
 
-必要な方のみ`json`形式でコンフィグファイルを作成してください。
+| 引数名 | 必須 | 説明 | デフォルト値 |
+| :--- | :---: | :--- | :--- |
+| `zenn-repo-name` | 〇 | Zenn用のリポジトリ名 | - |
+| `qiita-repo-name` | 〇 | Qiita用のリポジトリ名 | - |
+| `sync-to-repo-name` | 〇 | 同期先のリポジトリ名（`zenn-repo-name`または`qiita-repo-name`） | - |
+| `git-token` | 〇 | 同期先への書き込み権限を持つトークン | - |
+| `commit-msg` | - | 同期先へのコミットメッセージ | `Auto Commit.` |
+| `config-path` | - | カスタム設定ファイルのパス | `sync-zenn-qiita-articles/dist/sync-config.json` |
 
-設定内容については[こちら](#ユーザ設定について)。
+## :gear: Configuration
 
-#### ファイルイメージ
+オプションで、リポジトリのルートなどに`json`形式のコンフィグファイル（例: `sync-config.json`）を置くことで、変換の挙動をカスタマイズできます。
+作成した場合は、ワークフローファイルの`config-path`引数でパスを指定してください。
 
 ```json
 {
@@ -309,235 +200,29 @@ Github Apps トークンの生成を設定します。
 }
 ```
 
-## 双方向のフォーマット変換について
+| キー | 型 | 説明 |
+| :--- | :--- | :--- |
+| `deleteOn` | `boolean` | `true`の場合、同期元で記事を削除すると同期先の記事も削除します。 |
+| `imageFormat` | `"normal"` or `"tag"` | `Zenn -> Qiita`変換時の画像形式。`normal`はMarkdown記法、`tag`は`<img>`タグに変換します。 |
+| `dstImageBaseUrl` | `string` | `Zenn -> Qiita`変換時に、`/images/`から始まる画像パスのベースURLを指定します。 |
 
-### メタデータの変換
+## :repeat: Conversion Details
 
-```md
-# Zenn
----
-title: "title"
-emoji: "emoji"
-type: "tech"
-published: true
-topics: [topics1, topics2]
-...
----
+このアクションは、ZennとQiitaのMarkdown記法の違いを吸収するための変換処理を行います。
 
-↓
+- **メタデータ:** `title`, `tags`/`topics`, `published`/`private` などを相互に変換します。
+- **コンテンツ:**
+  - コードブロックの差分表示 (`diff`)
+  - 画像のキャプションやサイズ指定
+  - カスタムブロック (`:::message` / `:::note`)
+  - アコーディオン (`:::details` / `<details>`)
+  - 埋め込みリンク
 
-# Qiita
----
-title: "emoji title" # emojiが空の場合、titleのみ
-private: false # publishedの反転
-tags: # topics
-  - topics1
-  - topics2
-updated_at: ""
-id: null
-organization_url_name: null
-slide: false
-ignorePublish: false
-...
----
-```
+各記法の詳しい変換仕様については、以下のドキュメントを参照してください。
 
-```md
-# Qiita
----
-title: "title"
-private: false
-tags:
-  - tag1
-  - tag2
-updated_at: 'updated_at'
-id: id
-organization_url_name: null
-slide: false
-ignorePublish: false
-...
----
+- **[ZennとQiitaの記法と変換仕様](./docs/conversion_specifications.md)**
 
-↓
-
-# Zenn
----
-title: "title" # title
-emoji: ""
-type: "tech"
-published: true # privateの反転
-topics: [tag1, tag2] # tags
-...
----
-```
-
-### コンテンツの変換
-
-記法の違いについては[こちら](docs/diff_zenn_qiita.md)
-
-#### コードブロック（差分）
-
-````md
-# Zenn
-```diff python:title
-...
-```
-
-⇅
-
-# Qiita
-```diff_python:title
-...
-```
-````
-
-#### 画像リンク
-
-```md
-# Zenn
-![alt](url =200x)
-*caption*
-
-↓
-
-# Qiita
-# imageFormat == "normal"の場合
-![alt](url)
-
-# imageFormat == "tag"の場合
-<img src="url" alt="alt" width="200">
-```
-
-```md
-# Qiita
-![alt](url title)
-
-↓
-
-# Zenn
-![alt](url)
-```
-
-#### 埋め込み
-
-```md
-# Zenn
-@[xxx](url)
-
-↓
-
-# Qiita
-url
-```
-
-> [!warning]
-> `@[xxx](url)`で埋め込めるサービスによっては、`url`部分がURLでないパターンもあるため、この変換は完全ではありません。
->
-> また`Qiita` -> `Zenn`は、未実装です。
->
-> 詳細は[こちら](docs/diff_zenn_qiita.md#埋め込み)。
-
-#### カスタムブロック
-
-```md
-# Zenn
-:::message
-...
-:::
-
-:::message alert
-...
-:::
-
-:::message alert
-...
-:::
-
-⇅
-
-# Qiita
-:::note info
-...
-:::
-
-:::note warn
-...
-:::
-
-:::note alert
-...
-:::
-```
-
-#### アコーディオン
-
-```md
-# Zenn
-:::details title
-...
-:::
-
-⇅
-
-# Qiita
-<details><summary>title</summary>
-...
-</details>
-```
-
-## ユーザ設定について
-
-変更可能な設定を示します。
-
-### deleteOn
-
-同期元リポジトリの記事が削除された場合、同期先リポジトリの記事も削除するかどうかを設定します。（`true`: 削除する）
-
-デフォルト: `false`
-
-### imageFormat
-
-`Zenn` -> `Qiita`の際、画像をマークダウン記法に変換するか`<img>`タグに変換するかを設定します。
-
-実際には、`tag`以外はすべて`normal`として処理されます。
-
-デフォルト: `normal`
-
-| 値      | 変換                                 |
-| ---     | ---                                  |
-|`normal` |マークダウン記法（`![alt](url)`）     |
-|`tag`    |`<img>`タグ（`<img src=url alt=alt>`）|
-
-### dstImageBaseUrl
-
-`Zenn` -> `Qiita`の際、変換後の画像のベースURLを設定します。
-
-`Zenn`用のリポジトリを共有リポジトリとして、画像を`images`ディレクトリで管理する場合のみ、使用します。
-
-画像URLの運用については[こちら](docs/diff_zenn_qiita.md#画像)。
-
-デフォルト: `""`
-
-設定例: `https://github.com/<your-user-name>/<your-zenn-repo-name>/blob/<branch-name>`
-
-<!-- ============================================================
-  Structure
- ============================================================ -->
-
-<!-- ## :bookmark_tabs:Structure
-
-<div align=center>
-  <img
-    src='docs/image/classes.png'
-    alt='classes.'
-  />
-</div> -->
-
-<!-- ============================================================
-  License
- ============================================================ -->
-
-## :key:License
+## :key: License
 
 本リポジトリは、[MIT License](LICENSE)に基づいてライセンスされています。
 
